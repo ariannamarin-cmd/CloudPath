@@ -1,0 +1,1523 @@
+---
+description: Core project instructions
+alwaysApply: true
+---
+
+# CloudPath — Project Master Rules
+
+## Project Overview
+
+Build a small full-stack capstone application called **CloudPath**.
+
+CloudPath is a **Cloud Readiness & Modernization Assessment** application.
+
+Its purpose is to assess how ready an existing application is for cloud modernization and provide:
+
+1. A cloud-readiness score from 0–100
+2. A readiness level
+3. A recommended modernization strategy
+4. Identified strengths
+5. Identified modernization gaps
+6. Prioritized recommendations
+
+The application must run entirely locally for a short browser-based demo.
+
+Do not provision real cloud infrastructure.
+
+The project should remain intentionally small, clean, testable, and easy to understand.
+
+Avoid unnecessary abstraction or complexity.
+
+---
+
+# Core Technology Stack
+
+## Backend
+
+Use:
+
+* Node.js 20
+* Express 4
+* REST API
+* in-memory data store
+* port `4000`
+
+Do not use a persistent database.
+
+---
+
+## Frontend
+
+Use:
+
+* React 18
+* single-page application
+* browser-based UI
+* local development port `3000`
+
+Frontend API calls should use `/api` and proxy to the backend on port `4000`.
+
+Do not introduce Redux or another global state-management framework.
+
+---
+
+## Testing
+
+Use:
+
+* Jest
+* backend unit tests
+* API tests
+
+Target at least:
+
+`80%`
+
+backend test coverage.
+
+Do not write meaningless tests only to raise coverage.
+
+---
+
+# Application Architecture
+
+Use the following local architecture:
+
+```text
+Browser
+   |
+   v
+React SPA :3000
+   |
+   | REST /api
+   v
+Express API :4000
+   |
+   v
+Modernization Recommendation Engine
+   |
+   v
+In-Memory Assessment Store
+```
+
+---
+
+# Application Scope
+
+CloudPath evaluates an existing application's:
+
+* architecture
+* hosting model
+* deployment process
+* cloud engineering capabilities
+
+It then determines:
+
+* how cloud-ready the application is
+* what capabilities are already strong
+* what gaps exist
+* which modernization strategy is appropriate
+* what should be improved first
+
+The application itself does not need to call an external LLM.
+
+Use deterministic backend business rules.
+
+The scoring and recommendation component should be referred to as the:
+
+**Modernization Recommendation Engine**
+
+---
+
+# Explicitly Out of Scope
+
+Do not implement:
+
+* authentication
+* user accounts
+* authorization
+* persistent databases
+* external LLM APIs
+* AWS resource provisioning
+* ECS deployment
+* ECR image publishing
+* ALB provisioning
+* API Gateway
+* Lambda
+* Kubernetes
+* microservice decomposition
+* multiple frontend pages
+* Redux
+* unnecessary frameworks
+* unnecessary abstractions
+
+The complete working demo must run locally.
+
+---
+
+# Assessment Inputs
+
+Create one cloud-readiness assessment form.
+
+The form should include the following application profile fields.
+
+---
+
+## Current Architecture
+
+Options:
+
+* Monolith
+* Modular Monolith
+* Microservices
+
+Internal values may use normalized strings such as:
+
+```text
+monolith
+modular-monolith
+microservices
+```
+
+---
+
+## Current Hosting
+
+Options:
+
+* On-Premises
+* Virtual Machines
+* Cloud VMs
+* Containers
+* Managed Cloud Platform
+
+Internal values may use normalized strings such as:
+
+```text
+on-premises
+virtual-machines
+cloud-vms
+containers
+managed-cloud-platform
+```
+
+---
+
+## Deployment Process
+
+Options:
+
+* Manual
+* Scripted
+* CI/CD
+
+Internal values may use normalized strings such as:
+
+```text
+manual
+scripted
+cicd
+```
+
+---
+
+# Engineering Readiness Questions
+
+Use Yes/No controls for each capability.
+
+The assessment must ask:
+
+1. Is the application containerized?
+2. Is application state stored externally?
+3. Are secrets externalized from application code and configuration files?
+4. Does the application expose a health-check endpoint?
+5. Are logs centralized?
+6. Is infrastructure managed using Infrastructure as Code?
+7. Is deployment automated through CI/CD?
+8. Can the application scale horizontally?
+9. Is monitoring and observability configured?
+
+Recommended request property names:
+
+```text
+containerized
+externalizedState
+externalizedSecrets
+healthCheck
+centralizedLogging
+infrastructureAsCode
+cicd
+horizontalScaling
+observability
+```
+
+Values should be booleans.
+
+---
+
+# Cloud Readiness Scoring
+
+Perform all score calculation on the backend.
+
+Use the following weighted scoring model:
+
+| Capability                 | Weight |
+| -------------------------- | -----: |
+| Containerized              |     15 |
+| Externalized state         |     15 |
+| Externalized secrets       |     10 |
+| Health checks              |     10 |
+| Centralized logging        |     10 |
+| Infrastructure as Code     |     10 |
+| CI/CD                      |     15 |
+| Horizontal scaling         |     10 |
+| Monitoring / observability |      5 |
+
+Maximum possible score:
+
+`100`
+
+Only positive boolean answers contribute their assigned weight.
+
+Architecture, hosting, and deployment process should influence modernization strategy selection but should not directly alter the readiness score.
+
+---
+
+# Readiness Levels
+
+Classify the score using these exact ranges.
+
+## LOW
+
+Score:
+
+`0–39`
+
+Description:
+
+Significant foundational modernization work is recommended before migration.
+
+---
+
+## MODERATE
+
+Score:
+
+`40–69`
+
+Description:
+
+The application has some cloud-ready capabilities but requires targeted modernization.
+
+---
+
+## HIGH
+
+Score:
+
+`70–89`
+
+Description:
+
+The application is largely cloud-ready with a limited number of modernization gaps.
+
+---
+
+## CLOUD READY
+
+Score:
+
+`90–100`
+
+Description:
+
+The application demonstrates strong cloud-ready engineering practices.
+
+---
+
+# Modernization Strategies
+
+The application must return one of these strategies:
+
+* RETAIN
+* REHOST
+* REPLATFORM
+* REFACTOR
+
+The Modernization Recommendation Engine should consider:
+
+* readiness score
+* current architecture
+* current hosting
+* deployment process
+* whether state is externalized
+* whether horizontal scaling is supported
+* whether the application is containerized
+
+Keep the strategy logic deterministic and understandable.
+
+---
+
+# RETAIN Strategy
+
+Recommend:
+
+`RETAIN`
+
+when the application has significant foundational engineering gaps and immediate cloud migration would create unnecessary risk or complexity.
+
+Typical signals may include:
+
+* very low readiness score
+* manual deployment
+* little or no automation
+* limited observability
+* multiple missing foundational capabilities
+
+Strategy explanation:
+
+> The application requires foundational engineering improvements before migration. Focus first on repeatable deployment, configuration management, observability, and operational readiness.
+
+---
+
+# REHOST Strategy
+
+Recommend:
+
+`REHOST`
+
+when:
+
+* the application runs on-premises or on traditional virtual machines
+* readiness is low-to-moderate
+* major architectural redesign is not currently required
+
+This represents a lift-and-shift style modernization step.
+
+Strategy explanation:
+
+> The application can initially move to cloud infrastructure with minimal architectural change while modernization continues incrementally.
+
+---
+
+# REPLATFORM Strategy
+
+Recommend:
+
+`REPLATFORM`
+
+when:
+
+* readiness is moderate
+* the application already has several modern engineering capabilities
+* modernization can occur without a full rewrite
+* containerization or managed platform adoption would provide clear benefit
+
+This should be a common outcome.
+
+Strategy explanation:
+
+> A full rewrite is unnecessary. Focus on containerization, externalized state and configuration, automated deployment, observability, and managed cloud infrastructure.
+
+---
+
+# REFACTOR Strategy
+
+Recommend:
+
+`REFACTOR`
+
+when architectural constraints prevent the application from fully benefiting from cloud-native capabilities.
+
+Potential signals include:
+
+* monolithic architecture
+* local application state
+* inability to scale horizontally
+* tight architectural coupling
+* modernization requires architectural change rather than only platform change
+
+Strategy explanation:
+
+> Architectural changes are recommended before the application can fully benefit from cloud-native scalability, resilience, and independent service evolution.
+
+---
+
+# Strength Generation
+
+Generate a list of strengths based only on positive assessment answers.
+
+Supported strengths include:
+
+* Application is containerized
+* Application state is externalized
+* Secrets are externalized
+* Health checks are implemented
+* Centralized logging is configured
+* Infrastructure is managed as code
+* Automated CI/CD pipeline exists
+* Application supports horizontal scaling
+* Monitoring and observability are configured
+
+Do not return strengths for capabilities the user marked as absent.
+
+---
+
+# Modernization Gap Generation
+
+Generate a list of gaps based only on negative assessment answers.
+
+Supported gaps include:
+
+* Application is not containerized
+* Application state is stored locally
+* Secrets are embedded in application configuration
+* Health checks are missing
+* Centralized logging is missing
+* Infrastructure is not managed as code
+* Deployment is not automated
+* Application cannot scale horizontally
+* Monitoring and observability are missing
+
+---
+
+# Recommendation Generation
+
+Generate recommendations directly from identified gaps.
+
+Each recommendation must contain:
+
+```json
+{
+  "priority": "HIGH",
+  "action": "Containerize the application",
+  "reason": "Creates a consistent runtime and prepares the workload for modern cloud platforms."
+}
+```
+
+Supported priorities:
+
+* HIGH
+* MEDIUM
+
+Return HIGH priority recommendations before MEDIUM priority recommendations.
+
+---
+
+# Recommendation Rules
+
+## Containerization
+
+Priority:
+
+`HIGH`
+
+Action:
+
+`Containerize the application`
+
+Reason:
+
+Creates a consistent runtime environment and prepares the workload for managed container platforms.
+
+---
+
+## Externalized State
+
+Priority:
+
+`HIGH`
+
+Action:
+
+`Externalize application state`
+
+Reason:
+
+Stateless application instances can be replaced or scaled independently.
+
+---
+
+## Secrets Management
+
+Priority:
+
+`HIGH`
+
+Action:
+
+`Externalize application secrets`
+
+Reason:
+
+Separates sensitive credentials from source code and application configuration.
+
+---
+
+## CI/CD
+
+Priority:
+
+`HIGH`
+
+Action:
+
+`Implement automated CI/CD`
+
+Reason:
+
+Creates repeatable deployments and reduces manual release risk.
+
+---
+
+## Infrastructure as Code
+
+Priority:
+
+`MEDIUM`
+
+Action:
+
+`Manage infrastructure using Infrastructure as Code`
+
+Reason:
+
+Makes cloud infrastructure repeatable, reviewable, version-controlled, and easier to reproduce.
+
+---
+
+## Health Checks
+
+Priority:
+
+`MEDIUM`
+
+Action:
+
+`Implement application health checks`
+
+Reason:
+
+Allows infrastructure and orchestration platforms to automatically identify unhealthy application instances.
+
+---
+
+## Centralized Logging
+
+Priority:
+
+`MEDIUM`
+
+Action:
+
+`Centralize application logging`
+
+Reason:
+
+Improves troubleshooting and operational visibility across environments.
+
+---
+
+## Horizontal Scaling
+
+Priority:
+
+`HIGH`
+
+Action:
+
+`Enable horizontal scaling`
+
+Reason:
+
+Allows additional application instances to handle increased demand and improves resilience.
+
+---
+
+## Monitoring and Observability
+
+Priority:
+
+`MEDIUM`
+
+Action:
+
+`Implement monitoring and observability`
+
+Reason:
+
+Provides visibility into application health, performance, reliability, and failures.
+
+---
+
+# REST API
+
+All API routes should be under:
+
+`/api`
+
+Backend base URL during local development:
+
+```text
+http://localhost:4000
+```
+
+---
+
+# Health Endpoint
+
+Implement:
+
+`GET /api/health`
+
+Response:
+
+```json
+{
+  "status": "ok",
+  "service": "cloudpath-api"
+}
+```
+
+---
+
+# Create Assessment Endpoint
+
+Implement:
+
+`POST /api/assessments`
+
+Expected request body:
+
+```json
+{
+  "architecture": "monolith",
+  "hosting": "virtual-machines",
+  "deploymentProcess": "manual",
+  "containerized": false,
+  "externalizedState": false,
+  "externalizedSecrets": true,
+  "healthCheck": true,
+  "centralizedLogging": false,
+  "infrastructureAsCode": true,
+  "cicd": true,
+  "horizontalScaling": false,
+  "observability": true
+}
+```
+
+Successful response should include:
+
+```json
+{
+  "id": "assessment-1",
+  "readinessScore": 50,
+  "readinessLevel": "MODERATE",
+  "modernizationStrategy": "REPLATFORM",
+  "summary": "The application has several cloud-ready capabilities but requires targeted modernization.",
+  "strengths": [],
+  "gaps": [],
+  "recommendations": []
+}
+```
+
+---
+
+# List Assessments Endpoint
+
+Implement:
+
+`GET /api/assessments`
+
+Store completed assessments in memory while the server is running.
+
+Example response:
+
+```json
+[
+  {
+    "id": "assessment-1",
+    "readinessScore": 50,
+    "readinessLevel": "MODERATE",
+    "modernizationStrategy": "REPLATFORM"
+  }
+]
+```
+
+Persistence across application restarts is not required.
+
+---
+
+# Request Validation
+
+Validate all required assessment properties.
+
+Return:
+
+`HTTP 400`
+
+for malformed or incomplete requests.
+
+Response format:
+
+```json
+{
+  "error": "Invalid assessment request",
+  "details": [
+    "architecture is required"
+  ]
+}
+```
+
+Validate:
+
+* architecture is a supported option
+* hosting is a supported option
+* deploymentProcess is a supported option
+* all readiness properties are booleans
+
+Avoid adding a heavy validation framework unless necessary.
+
+---
+
+# Backend Structure
+
+Use a simple backend structure similar to:
+
+```text
+backend/
+├── src/
+│   ├── app.js
+│   ├── server.js
+│   ├── routes/
+│   │   └── assessments.js
+│   ├── services/
+│   │   └── assessmentService.js
+│   └── data/
+│       └── assessments.js
+├── tests/
+│   ├── assessmentService.test.js
+│   └── assessments.test.js
+└── package.json
+```
+
+---
+
+# Backend Separation of Concerns
+
+`app.js`
+
+Should:
+
+* create the Express application
+* configure middleware
+* mount routes
+* export the app for testing
+
+---
+
+`server.js`
+
+Should:
+
+* import the app
+* start the server on port `4000`
+
+---
+
+`routes/assessments.js`
+
+Should:
+
+* validate requests
+* call the assessment service
+* manage API responses
+
+Keep route handlers thin.
+
+---
+
+`services/assessmentService.js`
+
+Should contain the core Modernization Recommendation Engine.
+
+It should be responsible for:
+
+* score calculation
+* readiness classification
+* modernization strategy selection
+* summary generation
+* strength generation
+* gap generation
+* recommendation generation
+
+Business logic must remain testable independently of Express.
+
+---
+
+`data/assessments.js`
+
+Should provide the in-memory assessment store.
+
+Keep this simple.
+
+---
+
+# Frontend Structure
+
+Use a simple React structure.
+
+A suggested structure is:
+
+```text
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── AssessmentForm.jsx
+│   │   ├── AssessmentResults.jsx
+│   │   ├── ReadinessScore.jsx
+│   │   ├── StrategyCard.jsx
+│   │   └── RecommendationCard.jsx
+│   ├── App.jsx
+│   ├── index.js
+│   └── styles.css
+├── public/
+└── package.json
+```
+
+Do not over-componentize.
+
+Create components only when they improve readability.
+
+---
+
+# Frontend Header
+
+Display:
+
+# CloudPath
+
+Subtitle:
+
+**Cloud Readiness & Modernization Assessment**
+
+Supporting text:
+
+> Evaluate an existing application, identify cloud-modernization gaps, and determine the most appropriate modernization path.
+
+---
+
+# Assessment Form UI
+
+Create sections for:
+
+## Application Profile
+
+Fields:
+
+* Current Architecture
+* Current Hosting
+* Deployment Process
+
+---
+
+## Cloud Engineering Readiness
+
+Yes/No controls for:
+
+* Containerized
+* Externalized State
+* Externalized Secrets
+* Health Checks
+* Centralized Logging
+* Infrastructure as Code
+* CI/CD Automation
+* Horizontal Scaling
+* Monitoring / Observability
+
+Primary action:
+
+**Assess Application**
+
+---
+
+# Results Dashboard
+
+The results experience is the most important UI element.
+
+It must clearly display:
+
+1. readiness score
+2. readiness level
+3. modernization strategy
+4. strategy explanation
+5. strengths
+6. modernization gaps
+7. prioritized recommendations
+
+---
+
+# Readiness Score Display
+
+Display the score prominently.
+
+Example:
+
+```text
+58%
+
+MODERATE CLOUD READINESS
+```
+
+The readiness level should be visually distinguishable.
+
+---
+
+# Modernization Strategy Display
+
+Prominently display the strategy.
+
+Example:
+
+```text
+Recommended Modernization Strategy
+
+REPLATFORM
+```
+
+Include the corresponding strategy explanation.
+
+---
+
+# Strengths Section
+
+Display positive capabilities clearly.
+
+Use simple success indicators.
+
+Example:
+
+```text
+✓ CI/CD automation exists
+✓ Infrastructure is managed as code
+✓ Secrets are externalized
+✓ Health checks are implemented
+```
+
+---
+
+# Modernization Gaps Section
+
+Display identified gaps clearly.
+
+Example:
+
+```text
+Application is not containerized
+Application state is stored locally
+Centralized logging is missing
+Application cannot scale horizontally
+```
+
+---
+
+# Recommendations Section
+
+Display the top three recommendations prominently.
+
+Show:
+
+* priority
+* action
+* reason
+
+Example:
+
+```text
+HIGH PRIORITY
+
+Containerize the application
+
+Creates a consistent runtime and prepares the workload for modern cloud platforms.
+```
+
+If more than three recommendations exist, additional recommendations may appear below the first three.
+
+HIGH priority items must appear before MEDIUM priority items.
+
+---
+
+# Reset Behavior
+
+After results are displayed, provide:
+
+**Assess Another Application**
+
+This should reset the assessment state and return the user to the assessment form.
+
+---
+
+# Visual Design Rules
+
+The application should look like a lightweight cloud engineering or architecture assessment dashboard.
+
+Prioritize:
+
+* clean layout
+* strong visual hierarchy
+* clear typography
+* card-based grouping
+* generous spacing
+* subtle borders
+* readable form controls
+* responsive layout
+* clear status indicators
+
+Avoid:
+
+* excessive animation
+* unnecessary navigation
+* giant hero sections
+* excessive gradients
+* complex charts
+* multiple pages
+* decorative elements that distract from the assessment
+
+The result screen should be understandable immediately during a short technical demo.
+
+---
+
+# Readiness Status Styling
+
+Provide visually distinct status styling for:
+
+* LOW
+* MODERATE
+* HIGH
+* CLOUD READY
+
+Do not rely only on color.
+
+Include readable text labels.
+
+---
+
+# Recommendation Priority Styling
+
+Provide visually distinct badges for:
+
+* HIGH
+* MEDIUM
+
+Do not rely only on color.
+
+---
+
+# Backend Tests
+
+Use Jest.
+
+Test at minimum:
+
+1. score calculation
+2. LOW readiness classification
+3. MODERATE readiness classification
+4. HIGH readiness classification
+5. CLOUD READY classification
+6. RETAIN strategy
+7. REHOST strategy
+8. REPLATFORM strategy
+9. REFACTOR strategy
+10. strengths generation
+11. gap generation
+12. recommendation generation
+13. GET `/api/health`
+14. successful POST `/api/assessments`
+15. invalid assessment request
+
+Target:
+
+`>=80%`
+
+backend coverage.
+
+---
+
+# Local Development
+
+Backend commands should support a workflow similar to:
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+Frontend commands should support:
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Application should then be accessible at:
+
+```text
+http://localhost:3000
+```
+
+The React application should proxy API requests to:
+
+```text
+http://localhost:4000
+```
+
+---
+
+# Optional Docker Support
+
+If time permits, create:
+
+```text
+backend/Dockerfile
+frontend/Dockerfile
+docker-compose.yml
+```
+
+Backend Docker image should use Node.js 20.
+
+Frontend Docker image may use:
+
+* Node.js build stage
+* nginx runtime stage
+
+Docker support must remain local.
+
+Do not add AWS deployment requirements.
+
+Do not allow Docker work to block completion of the application.
+
+---
+
+# Optional CI Workflow
+
+If time permits, create a lightweight GitHub Actions CI workflow.
+
+It may include:
+
+* dependency installation
+* lint
+* Jest tests
+* coverage validation
+* security scan
+* Docker build validation
+
+Do not include AWS deployment.
+
+CI work must not block completion of the working local application.
+
+---
+
+# Optional Infrastructure Documentation
+
+Terraform may exist only as a non-executed architectural example if required by the broader bootcamp materials.
+
+Do not run:
+
+```text
+terraform apply
+```
+
+Do not create or require real AWS infrastructure.
+
+The application must not depend on Terraform.
+
+---
+
+# README Requirements
+
+Create a root-level `README.md`.
+
+It should include:
+
+## Project Overview
+
+Explain that CloudPath assesses cloud modernization readiness and recommends a modernization strategy.
+
+---
+
+## Features
+
+Include:
+
+* cloud-readiness scoring
+* readiness classification
+* modernization strategy selection
+* strength identification
+* gap identification
+* prioritized recommendations
+
+---
+
+## Tech Stack
+
+Document:
+
+* React 18
+* Node.js 20
+* Express 4
+* Jest
+* in-memory storage
+
+Also document Docker or CI only if implemented.
+
+---
+
+## Local Setup
+
+Provide clear instructions for running:
+
+* backend
+* frontend
+* tests
+
+---
+
+## Application Architecture
+
+Include the local architecture.
+
+---
+
+## Modernization Recommendation Engine
+
+Briefly document:
+
+* weighted readiness score
+* readiness classifications
+* RETAIN
+* REHOST
+* REPLATFORM
+* REFACTOR
+
+---
+
+## AI-Accelerated Engineering
+
+Include a section titled:
+
+**What AI Accelerated**
+
+Explain that AI assisted with:
+
+* application scaffolding
+* frontend implementation
+* REST API design
+* backend implementation
+* scoring logic
+* modernization rules
+* Jest test generation
+* code refinement
+* documentation
+* optional containerization
+* optional CI configuration
+
+Also explain that the engineer remained responsible for:
+
+* defining the business problem
+* architecture decisions
+* selecting assessment criteria
+* validating scoring weights
+* defining modernization strategy rules
+* reviewing generated code
+* testing
+* validation
+* prioritization
+
+---
+
+# Demo Scenario
+
+Optimize the application so the following assessment produces a useful mixed result.
+
+Use:
+
+```text
+Architecture: Monolith
+Hosting: Virtual Machines
+Deployment Process: Scripted
+
+Containerized: No
+Externalized State: No
+Externalized Secrets: Yes
+Health Checks: Yes
+Centralized Logging: No
+Infrastructure as Code: Yes
+CI/CD: Yes
+Horizontal Scaling: No
+Observability: Yes
+```
+
+This scenario should produce:
+
+* a moderate readiness score
+* multiple strengths
+* multiple modernization gaps
+* useful prioritized recommendations
+* an appropriate modernization strategy
+
+The result should be visually strong enough for a short live demo.
+
+---
+
+# Implementation Phases
+
+## Phase 1 — Repository and Backend Foundation
+
+1. Inspect the existing repository.
+2. Preserve working files where possible.
+3. Create backend project structure.
+4. Configure Express.
+5. Implement `/api/health`.
+6. Configure in-memory assessment storage.
+7. Configure Jest.
+
+Do not start infrastructure work.
+
+---
+
+## Phase 2 — Modernization Recommendation Engine
+
+Implement and unit test:
+
+1. score calculation
+2. readiness classification
+3. strength generation
+4. gap generation
+5. recommendation generation
+6. modernization strategy selection
+7. result summary generation
+
+Keep all logic deterministic.
+
+Run tests and fix failures before moving on.
+
+---
+
+## Phase 3 — Assessment API
+
+Implement:
+
+* `POST /api/assessments`
+* `GET /api/assessments`
+* request validation
+* error responses
+
+Add API tests.
+
+Run backend tests and confirm coverage.
+
+---
+
+## Phase 4 — React Assessment Form
+
+Build:
+
+* application header
+* application profile fields
+* readiness questions
+* Assess Application button
+* form submission
+* loading state
+* API error state
+
+Connect the frontend to the backend.
+
+---
+
+## Phase 5 — Results Dashboard
+
+Build:
+
+* readiness score display
+* readiness level
+* modernization strategy
+* strategy explanation
+* strengths
+* gaps
+* top three recommendations
+* additional recommendations if needed
+* Assess Another Application reset behavior
+
+Prioritize clarity and visual polish.
+
+---
+
+## Phase 6 — Validation and Demo Polish
+
+1. Run the full application locally.
+2. Test the demo scenario.
+3. Confirm frontend/backend integration.
+4. Fix UI issues.
+5. Fix API errors.
+6. Confirm reset functionality.
+7. Confirm the result is easy to understand during a short demo.
+8. Confirm Jest tests pass.
+9. Confirm coverage target.
+
+---
+
+## Phase 7 — Supporting Engineering Artifacts
+
+Only after the working application is complete:
+
+1. write README
+2. optionally add Docker support
+3. optionally add GitHub Actions CI
+4. optionally add non-executed infrastructure documentation
+
+Do not provision infrastructure.
+
+---
+
+# Priority Order
+
+When time is constrained, prioritize work in this order:
+
+1. Modernization Recommendation Engine
+2. REST API
+3. React assessment form
+4. results dashboard
+5. frontend/backend integration
+6. Jest tests
+7. visual polish
+8. README
+9. Docker
+10. CI workflow
+11. infrastructure documentation
+
+Never sacrifice the working application to complete optional engineering artifacts.
+
+---
+
+# Definition of Done
+
+The project is complete when:
+
+* React application runs locally
+* Express backend runs locally
+* assessment form works
+* frontend communicates with backend
+* readiness score is calculated correctly
+* readiness level is returned correctly
+* modernization strategy is returned
+* strengths are identified
+* modernization gaps are identified
+* recommendations are prioritized
+* results display clearly
+* top recommendations are easy to understand
+* reset functionality works
+* backend Jest tests pass
+* backend coverage meets the target
+* the application can be demonstrated entirely from localhost
